@@ -51,6 +51,11 @@ namespace Articles_CRUD.Forms
                 this.Close();
                 this.Dispose();
             }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
+            }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK,MessageBoxIcon.Error);
