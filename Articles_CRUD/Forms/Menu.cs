@@ -15,17 +15,19 @@ namespace Articles_CRUD
         public frmMain()
         {
             InitializeComponent();
-            ChekIfWarehousesListIfNotEmpty();
+            ChekIfWarehousesListIsNotEmpty();
             bindingSource.DataSource = itemsList;
             dtgArticles.DataSource = bindingSource;
             dtgArticles.AutoGenerateColumns = true;
-            LoadBindingSource();
+            LoadBindingSource(itemsList);
         }
 
         #region variables
-        internal List<Warehouse> warehousesList = new List<Warehouse>();
-        internal List<Item> itemsList = new List<Item>();
+        public List<Warehouse> warehousesList = new List<Warehouse>();
+        public List<Item> itemsList = new List<Item>();
+        List<Item> filteredItemList = new List<Item>();
         BindingSource bindingSource = new BindingSource();
+        bool isFiltered = false;
         #endregion variables
 
         #region methods
@@ -34,7 +36,7 @@ namespace Articles_CRUD
         /// Check that the list of warehouses is not empty.
         /// If it is, disable the button to create items.
         /// </summary>
-        void ChekIfWarehousesListIfNotEmpty()
+        void ChekIfWarehousesListIsNotEmpty()
         {
             if (warehousesList.Count == 0)
             {
@@ -49,9 +51,9 @@ namespace Articles_CRUD
         /// <summary>
         /// Load the bindingSource reassigning the list of items as dataSource.
         /// </summary>
-        void LoadBindingSource()
+        void LoadBindingSource(List<Item> list)
         {
-            bindingSource.DataSource = itemsList;
+            bindingSource.DataSource = list;
             bindingSource.ResetBindings(false);
         }
 
@@ -59,16 +61,14 @@ namespace Articles_CRUD
         /// Handles the deletion of an item from the items list at the specified row index.
         /// </summary>
         /// <param name="rowIndex">The index of the row where the delete button was clicked.</param>
-        void HandleDeleteButtonClick(int rowIndex)
+        void HandleDeleteButtonClick(Item selectedItem)
         {
-            Item selectedItem = itemsList[rowIndex];
-
             DialogResult result = MessageBox.Show($"Are you sure you want to delete the item '{selectedItem.Name}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 itemsList.Remove(selectedItem);
-                LoadBindingSource();
+                LoadBindingSource(itemsList);
             }
         }
 
@@ -76,10 +76,8 @@ namespace Articles_CRUD
         /// Handles the update of an item by opening the update form.
         /// </summary>
         /// <param name="rowIndex">The index of the row where the update button was clicked.</param>
-        void HandleEditButtonClick(int rowIndex)
+        void HandleEditButtonClick(Item selectedItem)
         {
-            Item selectedItem = itemsList[rowIndex];
-
             DialogResult result = MessageBox.Show($"Are you sure you want to Update the item '{selectedItem.Name}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
@@ -109,8 +107,8 @@ namespace Articles_CRUD
 
                 form.Owner = this;
                 form.ShowDialog();
-                ChekIfWarehousesListIfNotEmpty();
-                LoadBindingSource();
+                ChekIfWarehousesListIsNotEmpty();
+                LoadBindingSource(itemsList);
             }
         }
 
@@ -151,22 +149,52 @@ namespace Articles_CRUD
             // It is checked that the row where clicked in the dataGrid exists,
             // and let the clickead column be a datagridview button
             if (e.RowIndex >= 0 && dtgArticles.Columns[e.ColumnIndex] is DataGridViewButtonColumn clickedColumn)
-            {   
-                if (clickedColumn != null)// It is checked that it is not null
+            {
+                Item selectedItem;
+                if (isFiltered)
                 {
-                    if (clickedColumn.Name == "DeleteItem")// Checks if the column name is "DeleteItem" 
-                    {
-                        HandleDeleteButtonClick(e.RowIndex);// The method is called to delete the item
-                    }
-                    else if (clickedColumn.Name == "UpdateItem")// Checks if the column name is "UpdateItem"
-                    {
-                        HandleEditButtonClick(e.RowIndex);// The method is called to update the item
-                    }
+                    selectedItem = filteredItemList[e.RowIndex];
+                }
+                else
+                {
+                    selectedItem = itemsList[e.RowIndex];
+                }
+
+                if (clickedColumn.Name == "DeleteItem")// Checks if the column name is "DeleteItem" 
+                {
+                    HandleDeleteButtonClick(selectedItem);// The method is called to delete the item
+                }
+                else if (clickedColumn.Name == "UpdateItem")// Checks if the column name is "UpdateItem"
+                {
+                    HandleEditButtonClick(selectedItem);// The method is called to update the item
                 }
             }
         }
 
-        #endregion events
+        /// <summary>
+        /// Handles the event for when a key is pressed within the txtSearchItem.
+        /// If the text size is greater than or equal to 3 characters,
+        /// a list will be created that filters all items that begin with those three or more characters.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="KeyPressEventArgs"/>
+        /// instance containing the character that was pressed inside the textbox</param>
+        private void txtSearchItem_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (txtSearchItem.Text.Length >= 3)
+            {
+                filteredItemList = itemsList.Where(x => x.Name.StartsWith(txtSearchItem.Text,
+                                                  StringComparison.OrdinalIgnoreCase)).ToList();
+                LoadBindingSource(filteredItemList);
+                isFiltered = true;
+            }
+            else
+            {
+                LoadBindingSource(itemsList);
+                isFiltered = false;
+            }
+        }
 
+        #endregion events
     }
 }

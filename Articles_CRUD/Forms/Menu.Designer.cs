@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             dtgArticles = new DataGridView();
+            UpdateItem = new DataGridViewButtonColumn();
+            DeleteItem = new DataGridViewButtonColumn();
             txtSearchItem = new TextBox();
             btnCreateStore = new Button();
             btnCreateItem = new Button();
-            UpdateItem = new DataGridViewButtonColumn();
-            DeleteItem = new DataGridViewButtonColumn();
             ((System.ComponentModel.ISupportInitialize)dtgArticles).BeginInit();
             SuspendLayout();
             // 
@@ -48,12 +48,31 @@
             dtgArticles.TabIndex = 0;
             dtgArticles.CellContentClick += dtgArticles_CellContentClick;
             // 
+            // UpdateItem
+            // 
+            UpdateItem.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+            UpdateItem.HeaderText = "Update";
+            UpdateItem.MinimumWidth = 6;
+            UpdateItem.Name = "UpdateItem";
+            UpdateItem.Resizable = DataGridViewTriState.True;
+            UpdateItem.Width = 64;
+            // 
+            // DeleteItem
+            // 
+            DeleteItem.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+            DeleteItem.FlatStyle = FlatStyle.Popup;
+            DeleteItem.HeaderText = "Delete";
+            DeleteItem.MinimumWidth = 6;
+            DeleteItem.Name = "DeleteItem";
+            DeleteItem.Width = 59;
+            // 
             // txtSearchItem
             // 
-            txtSearchItem.Location = new Point(145, 22);
+            txtSearchItem.Location = new Point(123, 22);
             txtSearchItem.Name = "txtSearchItem";
             txtSearchItem.Size = new Size(286, 27);
             txtSearchItem.TabIndex = 1;
+            txtSearchItem.KeyPress += txtSearchItem_KeyPress;
             // 
             // btnCreateStore
             // 
@@ -74,24 +93,6 @@
             btnCreateItem.Text = "Add Item";
             btnCreateItem.UseVisualStyleBackColor = true;
             btnCreateItem.Click += btnCreateItem_Click;
-            // 
-            // UpdateItem
-            // 
-            UpdateItem.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-            UpdateItem.HeaderText = "Update";
-            UpdateItem.MinimumWidth = 6;
-            UpdateItem.Name = "UpdateItem";
-            UpdateItem.Resizable = DataGridViewTriState.True;
-            UpdateItem.Width = 64;
-            // 
-            // DeleteItem
-            // 
-            DeleteItem.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-            DeleteItem.FlatStyle = FlatStyle.Popup;
-            DeleteItem.HeaderText = "Delete";
-            DeleteItem.MinimumWidth = 6;
-            DeleteItem.Name = "DeleteItem";
-            DeleteItem.Width = 59;
             // 
             // frmMain
             // 
